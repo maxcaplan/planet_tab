@@ -1,0 +1,9 @@
+{
+  "manifest_version": 3,
+  "name": "Planet Tab",
+  "version": "0.1",
+  "description": "A custom new tab page that displays a 3d proceduraly generated planet",
+  "chrome_url_overrides": {
+    "newtab": "index.html"
+  }
+}
