@@ -28,13 +28,14 @@ export default class PlanetFace extends EngineObject {
     const indices: number[] = [];
     const normals: number[] = [];
 
-    // Generate geometry verticies
+    // Generate geometry verticies and normals
     for (let y = 0; y <= this.resolution; y++) {
       const y_percent = y / this.resolution;
 
       for (let x = 0; x <= this.resolution; x++) {
         const x_percent = x / this.resolution;
 
+        // Calculate points on face axes
         const point_on_axis_a = new THREE.Vector3()
           .copy(this.axisA)
           .multiplyScalar((x_percent - 0.5) * 2);
@@ -43,21 +44,31 @@ export default class PlanetFace extends EngineObject {
           .copy(this.axisB)
           .multiplyScalar((y_percent - 0.5) * 2);
 
+        // Project points onto unit cube
         const point_on_unit_cube = new THREE.Vector3();
         point_on_unit_cube.addVectors(this.local_up, point_on_axis_a);
         point_on_unit_cube.add(point_on_axis_b);
 
+        // Project points onto unit sphere
         const {
           x: x_cord,
           y: y_cord,
           z: z_cord,
         } = this.point_to_unit_sphere(point_on_unit_cube);
 
+        // Calculate normals
+        const {
+          x: norm_x,
+          y: norm_y,
+          z: norm_z,
+        } = point_on_unit_cube.normalize();
+
         vertices.push(x_cord, y_cord, z_cord);
+        normals.push(norm_x, norm_y, norm_z);
       }
     }
 
-    // Generate geometry indicies and normals
+    // Generate geometry indicies and
     for (let y = 0; y < this.resolution; y++) {
       for (let x = 0; x < this.resolution; x++) {
         const a = x + y * (this.resolution + 1) + index_offset;
@@ -68,30 +79,6 @@ export default class PlanetFace extends EngineObject {
         // generate two faces (triangles) per iteration
         indices.push(a, b, c); // face one
         indices.push(c, b, d); // face two
-
-        // generate face normals
-        const vert_a = new THREE.Vector3(...vertices.slice(a, a + 4));
-        const vert_b = new THREE.Vector3(...vertices.slice(b, b + 4));
-        const vert_c = new THREE.Vector3(...vertices.slice(c, c + 4));
-        const vert_d = new THREE.Vector3(...vertices.slice(d, d + 4));
-
-        const edge_a = new THREE.Vector3().subVectors(vert_a, vert_b);
-        const edge_b = new THREE.Vector3().subVectors(vert_b, vert_c);
-        const edge_c = new THREE.Vector3().subVectors(vert_c, vert_d);
-        const edge_d = new THREE.Vector3().subVectors(vert_d, vert_a);
-
-        const face_a_normal = new THREE.Vector3()
-          .crossVectors(edge_a, edge_b)
-          .normalize();
-        const face_b_normal = new THREE.Vector3()
-          .crossVectors(edge_d, edge_c)
-          .normalize();
-
-        const { x: aX, y: aY, z: aZ } = face_a_normal;
-        const { x: bX, y: bY, z: bZ } = face_b_normal;
-
-        normals.push(aX, aY, aZ);
-        normals.push(bX, bY, bZ);
       }
     }
 

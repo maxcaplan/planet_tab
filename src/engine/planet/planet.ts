@@ -76,7 +76,9 @@ export default class Planet extends EngineObject {
       "position",
       new THREE.Float32BufferAttribute(vertices, 3)
     );
-
-    this.geometry.computeVertexNormals();
+    this.geometry.setAttribute(
+      "normal",
+      new THREE.Float32BufferAttribute(normals, 3)
+    );
   }
 }
