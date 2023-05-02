@@ -26,7 +26,6 @@ export default class Planet extends EngineObject {
       p_material ||
       new THREE.MeshStandardMaterial({
         color: 0xcc5555,
-        side: THREE.DoubleSide,
         wireframe: false,
       });
 
@@ -36,7 +35,7 @@ export default class Planet extends EngineObject {
   public process(): void {
     if (this.object) {
       // this.object.rotation.x = Math.PI / 6;
-      this.object.rotation.y += 0.005;
+      this.object.rotation.y += 0.001;
     }
   }
 

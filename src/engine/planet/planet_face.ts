@@ -47,9 +47,12 @@ export default class PlanetFace extends EngineObject {
         point_on_unit_cube.addVectors(this.local_up, point_on_axis_a);
         point_on_unit_cube.add(point_on_axis_b);
 
-        const point_on_unit_sphere = point_on_unit_cube.normalize();
+        const {
+          x: x_cord,
+          y: y_cord,
+          z: z_cord,
+        } = this.point_to_unit_sphere(point_on_unit_cube);
 
-        const { x: x_cord, y: y_cord, z: z_cord } = point_on_unit_sphere;
         vertices.push(x_cord, y_cord, z_cord);
       }
     }
@@ -123,5 +126,18 @@ export default class PlanetFace extends EngineObject {
     this.axisA.z = this.local_up.x;
 
     this.axisB.crossVectors(this.local_up, this.axisA);
+  }
+
+  private point_to_unit_sphere(point: THREE.Vector3): THREE.Vector3 {
+    const x2 = Math.pow(point.x, 2);
+    const y2 = Math.pow(point.y, 2);
+    const z2 = Math.pow(point.z, 2);
+
+    const sphere_point = new THREE.Vector3();
+    sphere_point.x = point.x * Math.sqrt(1 - y2 / 2 - z2 / 2 + (y2 * z2) / 3);
+    sphere_point.y = point.y * Math.sqrt(1 - x2 / 2 - z2 / 2 + (x2 * z2) / 3);
+    sphere_point.z = point.z * Math.sqrt(1 - x2 / 2 - y2 / 2 + (x2 * y2) / 3);
+
+    return sphere_point;
   }
 }
