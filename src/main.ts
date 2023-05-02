@@ -1,48 +1,72 @@
 import "normalize.css";
 import "./style.css";
 
-import * as THREE from "three";
 import { WebGL } from "./utils/WebGL";
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(
-  75,
-  window.innerWidth / window.innerHeight,
-  0.1,
-  1000
-);
 
-const renderer = new THREE.WebGLRenderer();
-renderer.setSize(window.innerWidth, window.innerHeight);
-document.body.appendChild(renderer.domElement);
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
-const geometry = new THREE.BoxGeometry(1, 1, 1);
-const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-const cube = new THREE.Mesh(geometry, material);
-scene.add(cube);
+import Engine from "./engine/engine";
+import Planet from "./engine/planet/planet";
 
-camera.position.z = 5;
+let engine: Engine;
 
 function main() {
-  if (WebGL.isWebGLAvailable()) {
-    animate();
-  } else {
+  if (!WebGL.isWebGLAvailable()) {
     const warning = WebGL.getWebGLErrorMessage();
     const container = document.getElementById("container");
 
     if (container === null) {
       console.error(warning.innerHTML);
-      return;
+    } else {
+      container.appendChild(warning);
     }
 
-    container.appendChild(warning);
+    return;
   }
+
+  const camera_settings = {
+    fov: 75,
+    aspect: window.innerWidth / window.innerHeight,
+    near: 0.1,
+    far: 1000,
+  };
+
+  const renderer_size = {
+    width: window.innerWidth,
+    height: window.innerHeight,
+  };
+
+  engine = new Engine(camera_settings, renderer_size);
+  document.body.appendChild(engine.renderer.domElement);
+
+  const planet = new Planet(10);
+  planet.generate_geometry();
+  planet.create_object();
+
+  engine.addChild(planet);
+
+  engine.scene.add(
+    new OrbitControls(engine.camera, engine.renderer.domElement)
+  );
+
+  animate();
 }
 
 function animate() {
   requestAnimationFrame(animate);
-  cube.rotation.x += 0.01;
-  cube.rotation.y += 0.01;
-  renderer.render(scene, camera);
+
+  if (engine) {
+    engine.process();
+  }
 }
 
-main();
+function on_window_resize() {
+  if (engine) {
+    engine.resize(window.innerWidth, window.innerHeight);
+  }
+}
+
+window.onload = () => {
+  main();
+  window.onresize = on_window_resize;
+};
