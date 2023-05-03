@@ -25,7 +25,7 @@ export default class Planet extends EngineObject {
     this.material =
       p_material ||
       new THREE.MeshStandardMaterial({
-        color: 0xcc5555,
+        color: 0xffffff,
         wireframe: false,
       });
 

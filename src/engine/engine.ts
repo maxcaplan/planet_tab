@@ -1,6 +1,8 @@
 import * as THREE from "three";
 import EngineObject from "./engine_object";
 
+import Stats from "stats.js";
+
 export default class Engine {
   camera: THREE.PerspectiveCamera;
   scene: THREE.Scene;
@@ -10,6 +12,8 @@ export default class Engine {
   directional_light: THREE.DirectionalLight;
 
   children: EngineObject[];
+
+  stats: Stats | undefined;
 
   constructor(
     p_camera_settings: CameraSettings,
@@ -39,14 +43,24 @@ export default class Engine {
     this.renderer.setSize(p_renderer_size.width, p_renderer_size.height);
 
     this.children = [];
+
+    if (import.meta.env.DEV) {
+      this.stats = new Stats();
+      this.stats.showPanel(0);
+      document.body.appendChild(this.stats.dom);
+    }
   }
 
   public process(): void {
+    if (this.stats) this.stats.begin();
+
     this.children.forEach((child) => {
       child.process();
     });
 
     this.renderer.render(this.scene, this.camera);
+
+    if (this.stats) this.stats.end();
   }
 
   public resize(p_width: number, p_height: number): void {

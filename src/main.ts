@@ -9,6 +9,7 @@ import Engine from "./engine/engine";
 import Planet from "./engine/planet/planet";
 
 let engine: Engine;
+let controls: OrbitControls;
 
 function main() {
   if (!WebGL.isWebGLAvailable()) {
@@ -45,9 +46,7 @@ function main() {
 
   engine.addChild(planet);
 
-  engine.scene.add(
-    new OrbitControls(engine.camera, engine.renderer.domElement)
-  );
+  controls = new OrbitControls(engine.camera, engine.renderer.domElement);
 
   animate();
 }
@@ -57,6 +56,10 @@ function animate() {
 
   if (engine) {
     engine.process();
+  }
+
+  if (controls) {
+    controls.update();
   }
 }
 
