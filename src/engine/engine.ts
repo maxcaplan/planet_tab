@@ -13,7 +13,9 @@ export default class Engine {
 
   children: EngineObject[];
 
-  stats: Stats | undefined;
+  rendering: Boolean = true;
+
+  private stats: Stats | undefined;
 
   constructor(
     p_camera_settings: CameraSettings,
@@ -44,6 +46,8 @@ export default class Engine {
 
     this.children = [];
 
+    document.onvisibilitychange = () => this.update_rendering_state();
+
     if (import.meta.env.DEV) {
       this.stats = new Stats();
       this.stats.showPanel(0);
@@ -58,16 +62,9 @@ export default class Engine {
       child.process();
     });
 
-    this.renderer.render(this.scene, this.camera);
+    if (this.rendering) this.renderer.render(this.scene, this.camera);
 
     if (this.stats) this.stats.end();
-  }
-
-  public resize(p_width: number, p_height: number): void {
-    this.camera.aspect = p_width / p_height;
-    this.camera.updateProjectionMatrix();
-
-    this.renderer.setSize(p_width, p_height);
   }
 
   public addChild(child: EngineObject) {
@@ -80,5 +77,20 @@ export default class Engine {
 
     this.scene.add(child.object);
     this.children.push(child);
+  }
+
+  public resize(p_width: number, p_height: number): void {
+    this.camera.aspect = p_width / p_height;
+    this.camera.updateProjectionMatrix();
+
+    this.renderer.setSize(p_width, p_height);
+  }
+
+  private update_rendering_state() {
+    if (document.visibilityState == "visible") {
+      this.rendering = true;
+    } else {
+      this.rendering = false;
+    }
   }
 }
