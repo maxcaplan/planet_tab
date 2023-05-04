@@ -56,15 +56,8 @@ export default class PlanetFace extends EngineObject {
           z: z_cord,
         } = this.point_to_unit_sphere(point_on_unit_cube);
 
-        // Calculate normals
-        const {
-          x: norm_x,
-          y: norm_y,
-          z: norm_z,
-        } = point_on_unit_cube.normalize();
-
         vertices.push(x_cord, y_cord, z_cord);
-        normals.push(norm_x, norm_y, norm_z);
+        normals.push(x_cord, y_cord, z_cord);
       }
     }
 
