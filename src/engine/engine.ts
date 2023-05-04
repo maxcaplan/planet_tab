@@ -29,7 +29,7 @@ export default class Engine {
       p_camera_settings.far
     );
 
-    this.camera.position.z = 5;
+    this.camera.position.z = 3;
 
     this.scene = new THREE.Scene();
 

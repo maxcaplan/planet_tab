@@ -1,6 +1,10 @@
 import * as THREE from "three";
+
 import EngineObject from "../engine_object";
 import PlanetFace from "./planet_face";
+
+import VertShader from "../../shaders/planet/planet.vert?raw";
+import FragShader from "../../shaders/planet/planet.frag?raw";
 
 export default class Planet extends EngineObject {
   resolution: number;
@@ -24,9 +28,9 @@ export default class Planet extends EngineObject {
 
     this.material =
       p_material ||
-      new THREE.MeshStandardMaterial({
-        color: 0xffffff,
-        wireframe: false,
+      new THREE.ShaderMaterial({
+        vertexShader: VertShader,
+        fragmentShader: FragShader,
       });
 
     this.create_faces();
@@ -57,8 +61,6 @@ export default class Planet extends EngineObject {
     let vertices: number[] = [];
     let indices: number[] = [];
     let normals: number[] = [];
-
-    console.log(this.faces.length);
 
     this.faces.forEach((face) => {
       const face_vertex_data = face.generate_indexed_verticies(
